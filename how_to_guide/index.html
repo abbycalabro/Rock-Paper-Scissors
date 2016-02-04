@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html>
+<head>
+   <title>How To</title>
+   <link rel="stylesheet" type="text/css" href="default.css">
+   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap-theme.min.css">
+        <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.6/styles/default.min.css">
+   <script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
+   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+        <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.6/highlight.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script>
+</head>
+<body>
+   <div id="content" class="container">
+          <div class='well'>
+      <h1 class='page-header'>How-To Guide: Redis</h1>
+      <h4>by Abby Meunier, 5/24/15 </h4>
+      <div id="intro">
+         <h2 class='page-header'>INTRODUCTION</h2>
+         <p>
+            Redis, short for "REmote DIctionary Server", is an open source data structure server
+            and key-value store. Compatible with several types of data structures and over 30 <a href="http://redis.io/clients">programming languages</a>, keys can map to a variety of data types 
+            such as strings, sets, lists, and hashes.
+         </p>
+         <p>
+            Setting it apart from many other key-value databases is the fact that Redis’ dataset is held in memory rather than on disk,
+            resulting in a higher performance speed but limited possible dataset size.                
+         </p>
+         <p>
+            In order to achieve persistence, Redis' default behavior is to sync the dataset to disk a minimum of once every two seconds.
+            Alternatively, commands may be appended to a log, or persistence is able to be disabled completely.
+         <p>
+      </div>
+      <div id="install">
+         <h2>Download and Install</h2>
+         <p>Visit http://redis.io/download for the newest version of Redis.</p>
+         <p>
+            Redis is recommended for use with OS X and Linux operating systems, with Linux being the preffered OS.
+
+            To install Redis (the most recent version is 3.0 as of 5/24/15), run the following commands
+            from your terminal:
+         </p>
+         <p>
+            <pre>
+               <code class='bash'>
+   $ <b>wget</b> http://download.redis.io/releases/redis-3.0.1.tar.gz
+   $ <b>tar</b> xzf redis-3.0.1.tar.gz
+   $ <b>cd</b> redis-3.0.1
+   $ <b>make</b>         </code>
+            </pre>
+            Now you can start running Redis by calling the first command, and use the built-in client by starting a new tab
+            to run the second command: 
+            <pre>
+               <code class='bash'>
+   $ src/redis-server
+   $ src/redis-cli
+               </code>
+            </pre>
+         </p>
+      
+      </div>
+      <div id="description">
+         <h2 class='page-header'>Basic Commands and Uses</h2>
+         <p>
+            <h3>More on Keys:</h3>
+            When choosing a key, Redis <a href="http://redis.io/topics/data-types-intro#an-introduction-to-redis-data-types-and-abstractions">documentation</a>
+            recommends users be conscious when deciding on the key lenght. A key that is too short is less readable in use, and a key 
+            that is too long will cause excessive key-comparisons and be wasteful of memory (maximum size for a key or value is 512 MB).
+            Note: any binary sequence may be used as a key, including files and empty strings.
+         </p>
+         <p>
+            <h3>Working with Data Structures:</h3>
+            Unlike other key-value stores that only allow keys to map to strings, Redis supports the following 7 data structures:  
+            <ul>
+               <li>Strings and Bitmaps</li>
+               <li>Sets and Sorted Sets</li>
+               <li>Lists</li>
+               <li>Hashes</li>
+               <li>HyperLogLogs</li>
+            </ul> 
+            Read on for some basic examples of using Redis with these structures. For a complete list of commands available, please visit <a href="http://redis.io/commands">here</a>.
+         </p>
+         <p>
+            <h3>Example 1: Strings</h3>
+            Strings are considered the fundamental values of Redis. The most basic operations, the SET and GET commands, are used to create or replace a value for a string and retrieve that value, respectively. The EXISTS command will return 1 if the specified key exists in the database, or 0 if it
+            does not exist. Use the DEL command to remove a key and its value. Below is a basic use of these commands:
+            <pre>
+               <code class='bash'>
+127.0.0.1:6379> set beverage margarita
+OK
+127.0.0.1:6379> get beverage
+"margarita"
+127.0.0.1:6379> exists beverage
+(integer) 1
+127.0.0.1:6379> exists dessert
+(integer) 0
+127.0.0.1:6379> set beverage coffee
+OK
+127.0.0.1:6379> get beverage
+"coffee"
+127.0.0.1:6379> del beverage
+(integer) 1
+127.0.0.1:6379> exists beverage
+(integer) 0
+               </code>
+            </pre>
+         Additional commands commonly used with strings are GETSET, which assigns a new value to a string and returns the previous
+         value, APPEND, SETEX to set a value and an expiration, and SETNX, which only sets a key value if the key does not yet exist.
+         </p>
+         <p>
+            <h3>Example 2: Integers and Atomic Incrementing</h3>
+            One feature that Redis offers is atomic operations, which ensure that only one operation can be performed on a
+            variable at one time, protecting against race conditions. The simplest execution of one of these operations is by
+            using the INCR command. When INCR is called on a value, Redis parses it as an integer. The value is then incremented by one
+            and the key is assigned the new incremented value. The command DECR is similarly atomic and decrements a value by one, and 
+            INCRBY and DECRBY can be used to increment or decrement by a specific value rather than 1.
+         </p>
+         <p>
+            An example of INCR in action will be illustrated in the walkthrough below. More complex examples of atomic operations in 
+            Redis can be found <a href="http://redis.io/topics/transactions">here</a>, in which multiple commands may be executed in
+            one step in what is called a transaction.
+         </p>
+      </div>
+      <div id="walkthrough">
+         <h2 class='page-header'>PROJECT WALKTHROUGH</h2>
+         <p>
+            <h3>Intro</h3>
+            For the project portion of this How-To, we will use Redis and Python to create a simple Rock Paper Scissors game
+            played on the command line. Points are awarded to the player throughout the game depending on performance. Once a 
+            player completes the game, all the scores and associated player names will be printed to the screen.
+         </p>   
+         <p>   
+            Redis will be utilized to store player usernames and passwords, continuously track players' evolving scores,
+            and maintiain an accurate ranking of top scores achieved throughout all gameplay.
+         </p>
+         <p>
+            <h3>Installation</h3>
+            First, we will need to install redis-py, which is the library needed for Python to successfully interact with Redis.
+            Installing redis-py can be done by calling <code>pip install redis</code>, but in order to get the most up-to-date
+            version, run the following command to clone the public repository from GitHub:
+            <pre>
+               <code class='bash'>
+   $ git clone https://github.com/andymccurdy/redis-py.git
+               </code>
+            </pre>
+            Alternatively, visit the redis-py <a href="https://kushal.fedorapeople.org/redis-py/html/user/install.html">installation page</a>
+            for further information.
+         </p>
+         <p>
+            <h3>Create rps.py</h3>
+            Now, we are ready to create the Python file for our game, here named rps.py. We import redis at the top of the file, and
+            in our rock_paper_scissors function connect to the Redis server:
+            <pre>
+               <code class='python'>
+
+  1 import redis
+  2 import random
+  3
+  4 def rock_paper_scissors():
+  5
+  6     #Create a Redis object and connect to our Redis server
+  7     r = redis.Redis('localhost')
+  8
+  9
+ 10 #Call our function
+ 11 rock_paper_scissors()         </code>
+            </pre>
+         <h3>User Authentication</h3>
+         We need a way to store at least a player's username and password to make authentication possible. We could use a List data structure, but
+         in this case we are going to use a Hash. Hashes in Redis map between string keys and multiple string values, and they are strongly
+         recommended to represent objects such as a user.
+         </p>
+         <p>
+         Below we prompt the user if they have played before. If so, their username is already a hash key, and we simply verify their 
+         password. If not, the user is prompted to enter a new username and password and a new hash gets created with this information. 
+         </p>
+         <pre>
+            <code class='python'>
+ 10     #Authenticate user
+ 11     welcome_prompt= raw_input("Welcome to Rock Paper Scissors! Are you a new user? (y/n)  ")
+ 12     welcome_prompt = welcome_prompt.upper()
+ 13     valid = False
+ 14
+ 15     if(welcome_prompt == "Y"):
+ 16         #Add new user when valid username entered
+ 17         while(not valid):
+ 18             new_username = raw_input("Choose a username: ")
+ 19             new_password = getpass.getpass(prompt="Choose a password: ") #hide user input
+ 20             #Check if username exists
+ 21             if(r.hexists(new_username, "password")):
+ 22                 print("Username already taken.")
+ 23             else:
+ 24                 valid = True
+ 25                 #Add hash
+ 26                 r.hmset(new_username, {"password": new_password, "games_played": 0})
+ 27                 #Add user to Sorted Set
+ 28                 r.zadd("player_scores", new_username, 0)
+ 29     elif(welcome_prompt == "N"):
+ 30         start_validation = True
+ 31
+ 32         while(start_validation):
+ 33             valid_name = False
+ 34             #Validate username
+ 35             while(not valid_name):
+ 36                 username = raw_input("Enter username: ")
+ 37                 if(not r.hexists(username, "password")):
+ 38                     print("Invalid username.")
+ 39                 else:
+ 40                     valid_name = True
+ 41
+ 42             #Validate password
+ 43             password_attempt = getpass.getpass(prompt="Enter your password: ")
+ 44             if(password_attempt == r.hget(username, "password")):
+ 45                 start_validation = False
+ 46             else:
+ 47                 print("Invalid password.")
+ 48
+ 49     else:
+ 50         print("Sorry, not a valid response. Bye!")
+ 51         exit()            
+            </code>
+         </pre>
+         <p>
+         We are also using a second data structure, a Sorted Set called player_scores, to keep an updated score associated with each player. Sorted Sets are useful 
+         because of how quickly elements can be added, deleted, updated, and accessed. When a new user
+         is created, their score is initialized to 0 as illustrated on line 28.
+         </p>
+         <p>
+            <h3>Setting up the Game</h3>
+         Now that our user is authenticated and our Hashes and Sorted Set are created, we are ready to write the gameplay code. The following is Python code
+         for a player to play unlimited games of Rock Paper Scissors. At this point, the basic rules of the game are applied and appropriate print statements
+         are in place. Note that no points are yet awarded or displayed. We will get Redis to handle that data in a moment:
+         </p>
+         <pre>
+            <code class='python'>
+ 55 def play_game():
+ 56     options = ["ROCK", "PAPER", "SCISSORS"]
+ 57     new_game = True
+ 58
+ 59     while(new_game):
+ 60         print("Let's play! Each game has a maximum of 3 non-tied rounds. Players receive 5 points for each tie, 10 points for each round won and 30 bonus points for every game won. \n")
+ 61         current_round = 1
+ 62         user_wins = 0
+ 63
+ 64         #3 non-tying rounds to a game
+ 65         while(current_round &lt= 3):
+ 66             comp_choice = random.choice([0, 1, 2])
+ 67             user_choice = int(raw_input("Enter 0 for ROCK, 1 for PAPER, or 2 for SCISSORS: "))
+ 68
+ 69             print("I threw: " + options[comp_choice])
+ 70             print("You threw: " + options[user_choice])
+ 71
+ 72             #Compare throws
+ 73             if(user_choice == comp_choice):
+ 74                 print("Tie! \n")
+ 75             elif((user_choice - comp_choice) % 3 == 1):
+ 76                 print("You win round " + str(current_round) + "! \n")
+ 77                 user_wins += 1
+ 78                 current_round += 1
+ 79             else:
+ 80                 print("You lose round " + str(current_round) + "! \n")
+ 81                 current_round += 1
+ 82
+ 83             #No third round if user or comp has 2 wins
+ 84             if(current_round == 3 and user_wins != 1):
+ 85                 break            
+ 86
+ 87         #Declare game winner
+ 88         if(user_wins == 2):
+ 89             print("You win the game!")
+ 90         else:
+ 91             print("I win the game, puny human!")
+ 92
+ 93         answer = raw_input("Play again? (y/n) ")
+ 94         if(answer.upper() == "N"):
+ 95             #end game
+ 96             print("Goodbye!")
+ 97             new_game = False
+            </code>
+         </pre>
+         <p>
+            <h3>Calculating and Displaying Scores </h3>
+            We can now use the Sorted Set we created in Redis to track and update our player's scores. We set a variable called user_score to 0, then add points
+            to it every time the player ties or gets a win. After a game ends, the user's score in player_scores is incremented by the points won in the current
+            game (see lin 96).
+         </p>
+         <p>
+            Finally, on line 99 we call Redis' zrevrange function to return all key value pairs of player's names and the associated score they have accumulated.
+            The keys and values are parsed to display the data so it resembles a scoreboard so users can view all players and their scores in descending order.
+         </p>
+            <pre>
+               <code class='python'>
+ 57     while(new_game):
+ 58         print("Let's play! Each game has a maximum of 3 non-tied rounds. Players receive 5 points for each tie, 10 points for each round won and 30 bonus points for every game won. \n")
+ 59         current_round = 1
+ 60         user_wins = 0
+ 61         user_score = 0
+ 62
+ 63         #3 non-tying rounds to a game
+ 64         while(current_round &lt= 3):
+ 65             comp_choice = random.choice([0, 1, 2])
+ 66             user_choice = int(raw_input("Enter 0 for ROCK, 1 for PAPER, or 2 for SCISSORS: "))
+ 67
+ 68             print("I threw: " + options[comp_choice])
+ 69             print("You threw: " + options[user_choice])
+ 70
+ 71             #Compare throws
+ 72             if(user_choice == comp_choice):
+ 73                 print("Tie! \n")
+ 74                 user_score += 5
+ 75             elif((user_choice - comp_choice) % 3 == 1):
+ 76                 print("You win round " + str(current_round) + "! \n")
+ 77                 user_score += 10
+ 78                 user_wins += 1
+ 79                 current_round += 1
+ 80             else:
+ 81                 print("You lose round " + str(current_round) + "! \n")
+ 82                 current_round += 1
+ 83
+ 84             #No third round if user or comp has 2 wins
+ 85             if(current_round == 3 and user_wins != 1):
+ 86                 break
+ 87
+ 88         #Declare game winner
+ 89         if(user_wins == 2):
+ 90             print("You win the game! \n")
+ 91             user_score += 30
+ 92         else:
+ 93             print("I win the game, puny human! \n")
+ 94
+ 95         #Add score to player's cumulative score
+ 96         r.zincrby("player_scores", username, user_score)
+ 97
+ 98         #Display all player scores in descending order
+ 99         scoreboard = r.zrevrange("player_scores", 0, -1, withscores=True)
+100         print("Check your rank on the Scoreboard!")
+101         for i, j in scoreboard:
+102             print i + ": " + str(j) + '\n'
+               </code>
+            </pre>
+            
+         </p>
+         <p>
+            <h3>Conclusion</h3>
+            As you can see, Redis is a very useful tool that can applied to almost any project where speed and simplicity are valued, and its compatibility
+            with many languages enhances its versatility.
+            In this particular example, we successfully used Redis to interact with our Python code, store usernames and passwords, update and track
+            user scores, and return a fast and accurate ranking starting with the top scorers. For more information on Redis and its many uses, feel free
+            to browse the links below.
+         </p>
+      </div>
+      <div id="sources">
+         <h3 id="sources_header" class='page-header'>Sources:</h3>
+         <ul id="source_list">
+            <li>Documentation. http://redis.io/documentation. Redis (2015)</li>
+            <li>Redis. http://en.wikipedia.org/wiki/Redis. Wikipedia (2015)</li>
+            <li>Redis - Overview. http://www.tutorialspoint.com/redis/redis_overview.htm. Tutorialspoint (2015)</li>
+            <li>An introduction to Redis data types and abstractions. http://redis.io/topics/data-types-intro#an-introduction-to-redis-data-types-and-abstractions. Redis (2015)</li>
+            <li>Redis client Python usage. http://runnable.com/UsYEiWi1WK0uAABB/redis-client-python-usage. Runnable (2015)</li>
+            <li>Index. https://redis-py.readthedocs.org/en/latest/genindex.html. Redis-py (2011)</li>
+            <li>Getting Started: Redis and Python. http://degizmo.com/2010/03/22/getting-started-redis-and-python/. DeGizmo (2014)</li>
+            <li>Getting started with redis-py. http://agiliq.com/blog/2015/03/getting-started-with-redis-py/. Agiliq Blog (2012)</li>
+         </ul>   
+      </div>
+     </div>
+   </div>
+</body>
+</html>

@@ -1,0 +1,52 @@
+.well {
+	margin: auto;
+	font-family: arial;
+	font-size: 14pt;
+	width: 75%;
+}
+
+body {
+	background-image: url("http://cohoctonlibrary.org/wp-content/uploads/2014/06/Bookshelves-Background.jpg");
+	background-attachment: fixed;
+	background-repeat: no-repeat;
+}
+
+
+pre {
+	text-align: left;
+}
+
+ul {
+	text-align: left;
+	margin: auto;
+	width: 300px;
+}
+
+h1 {
+	text-align: center;
+}
+
+h2 {
+	text-decoration: underline;
+	color: green !important;
+	font-style: bold;
+	text-align: center;
+}
+
+h3 {
+	color: #004B00 !important;
+	text-align: center;
+}
+
+h4 {
+	text-align: center;
+}
+
+#source_list {
+	text-align: left;
+	width: 100%;
+}
+
+#sources_header {
+	text-align: left;
+}
